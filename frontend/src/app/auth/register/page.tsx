@@ -32,6 +32,18 @@ export default function RegisterPage() {
       return;
     }
 
+    if (formData.password.length < 8) {
+      toast.error("Password must be at least 8 characters long");
+      setIsLoading(false);
+      return;
+    }
+
+    if (formData.password.length > 128) {
+      toast.error("Password is too long (maximum 128 characters)");
+      setIsLoading(false);
+      return;
+    }
+
     try {
       await authService.register({
         username: formData.username,
@@ -125,10 +137,11 @@ export default function RegisterPage() {
                     id="password"
                     name="password"
                     type={showPassword ? "text" : "password"}
-                    placeholder="Create a password"
+                    placeholder="Create a password (8+ characters)"
                     value={formData.password}
                     onChange={handleChange}
                     required
+                    minLength={8}
                   />
                   <Button
                     type="button"
@@ -144,6 +157,9 @@ export default function RegisterPage() {
                     )}
                   </Button>
                 </div>
+                <p className="text-xs text-muted-foreground">
+                  Password must be 8-128 characters long
+                </p>
               </div>
 
               <div className="space-y-2">
