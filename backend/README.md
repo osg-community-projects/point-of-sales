@@ -24,13 +24,30 @@ A FastAPI-based Point of Sale system backend with JWT authentication, product ma
    # Edit .env with your configuration
    ```
 
-3. **Run the Application**
+3. **Run Database Migrations**
    ```bash
+   # Using the helper script
+   ./migrate.sh upgrade
+   
+   # Or using alembic directly
+   source venv/bin/activate
+   alembic upgrade head
+   ```
+
+4. **Run the Application**
+   ```bash
+   ./start.sh
+   ```
+   
+   Or manually:
+   ```bash
+   source venv/bin/activate
    python run.py
    ```
    
    Or using uvicorn directly:
    ```bash
+   source venv/bin/activate
    uvicorn main:app --reload --host 0.0.0.0 --port 8000
    ```
 
@@ -80,9 +97,35 @@ Once the server is running, visit:
 
 ## Database
 
-The application uses SQLite by default for development. The database file will be created automatically as `pos_system.db`.
+The application uses SQLite by default for development. The database schema is managed using Alembic migrations.
 
-For production, update the `DATABASE_URL` in your `.env` file to use PostgreSQL or another database.
+### Database Migrations
+
+This project uses Alembic for database schema version control:
+
+```bash
+# Run all pending migrations
+./migrate.sh upgrade
+
+# Create new migration after modifying models
+./migrate.sh create "Description of changes"
+
+# Check current database version
+./migrate.sh current
+
+# View migration history
+./migrate.sh history
+```
+
+For detailed migration documentation, see [DATABASE_MIGRATIONS.md](DATABASE_MIGRATIONS.md).
+
+### Production Database
+
+For production, update the `DATABASE_URL` in your `.env` file to use PostgreSQL or another database:
+
+```bash
+DATABASE_URL=postgresql://user:password@localhost/pos_system
+```
 
 ## Authentication
 

@@ -14,8 +14,8 @@ from app.exceptions import (
     general_exception_handler
 )
 
-# Create database tables
-Base.metadata.create_all(bind=engine)
+# Database tables are now managed by Alembic migrations
+# Run: alembic upgrade head
 
 app = FastAPI(
     title=settings.api_title,
