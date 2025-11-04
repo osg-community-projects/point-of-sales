@@ -30,24 +30,9 @@ import {
   AlertTriangle
 } from "lucide-react";
 import { toast } from "sonner";
+import { productService, type Product } from "@/services";
 
-interface Product {
-  id: number;
-  name: string;
-  description: string;
-  price: number;
-  cost: number;
-  sku: string;
-  barcode: string;
-  stock_quantity: number;
-  min_stock_level: number;
-  is_active: boolean;
-  category: {
-    id: number;
-    name: string;
-  } | null;
-  created_at: string;
-}
+// Product interface is now imported from services
 
 export default function ProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -69,51 +54,27 @@ export default function ProductsPage() {
   }, [products, searchTerm]);
 
   const fetchProducts = async () => {
-    const token = localStorage.getItem("token");
-    if (!token) return;
-
     try {
-      const response = await fetch("http://localhost:8001/api/products/", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setProducts(data);
-      } else {
-        toast.error("Failed to fetch products");
-      }
-    } catch (error) {
-      toast.error("Network error");
+      const data = await productService.getProducts();
+      setProducts(data);
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.detail || "Failed to fetch products";
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }
   };
 
   const deleteProduct = async (productId: number) => {
-    const token = localStorage.getItem("token");
-    if (!token) return;
-
     if (!confirm("Are you sure you want to delete this product?")) return;
 
     try {
-      const response = await fetch(`http://localhost:8001/api/products/${productId}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (response.ok) {
-        toast.success("Product deleted successfully");
-        fetchProducts();
-      } else {
-        toast.error("Failed to delete product");
-      }
-    } catch (error) {
-      toast.error("Network error");
+      await productService.deleteProduct(productId);
+      toast.success("Product deleted successfully");
+      fetchProducts();
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.detail || "Failed to delete product";
+      toast.error(errorMessage);
     }
   };
 

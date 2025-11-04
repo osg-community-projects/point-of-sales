@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Sidebar } from "@/components/dashboard/sidebar";
+import { authService } from "@/services";
 
 export default function DashboardLayout({
   children,
@@ -12,29 +13,18 @@ export default function DashboardLayout({
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) {
+    if (!authService.isAuthenticated()) {
       window.location.href = "/auth/login";
       return;
     }
 
     // Verify token with backend
-    fetch("http://localhost:8001/api/auth/me", {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    })
-      .then((response) => {
-        if (response.ok) {
-          setIsAuthenticated(true);
-        } else {
-          localStorage.removeItem("token");
-          window.location.href = "/auth/login";
-        }
+    authService.getCurrentUser()
+      .then(() => {
+        setIsAuthenticated(true);
       })
       .catch(() => {
-        localStorage.removeItem("token");
-        window.location.href = "/auth/login";
+        authService.logout();
       })
       .finally(() => {
         setIsLoading(false);

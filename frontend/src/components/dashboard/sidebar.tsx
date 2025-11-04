@@ -14,6 +14,7 @@ import {
   Settings,
   LogOut
 } from "lucide-react";
+import { authService } from "@/services";
 
 const navigation = [
   {
@@ -52,8 +53,7 @@ export function Sidebar() {
   const pathname = usePathname();
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    window.location.href = "/auth/login";
+    authService.logout();
   };
 
   return (

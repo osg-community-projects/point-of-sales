@@ -12,6 +12,7 @@ import {
   AlertTriangle
 } from "lucide-react";
 import Link from "next/link";
+import { orderService, productService, customerService } from "@/services";
 
 interface DashboardStats {
   totalOrders: number;
@@ -35,27 +36,12 @@ export default function DashboardPage() {
 
   useEffect(() => {
     const fetchDashboardData = async () => {
-      const token = localStorage.getItem("token");
-      if (!token) return;
-
       try {
-        // Fetch dashboard statistics
-        const [ordersRes, productsRes, customersRes] = await Promise.all([
-          fetch("http://localhost:8001/api/orders/", {
-            headers: { Authorization: `Bearer ${token}` },
-          }),
-          fetch("http://localhost:8001/api/products/", {
-            headers: { Authorization: `Bearer ${token}` },
-          }),
-          fetch("http://localhost:8001/api/customers/", {
-            headers: { Authorization: `Bearer ${token}` },
-          }),
-        ]);
-
+        // Fetch dashboard statistics using services
         const [orders, products, customers] = await Promise.all([
-          ordersRes.json(),
-          productsRes.json(),
-          customersRes.json(),
+          orderService.getOrders(),
+          productService.getProducts(),
+          customerService.getCustomers(),
         ]);
 
         // Calculate statistics

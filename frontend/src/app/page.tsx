@@ -150,7 +150,7 @@ export default function HomePage() {
       {/* Footer */}
       <footer className="border-t bg-card py-8 px-4">
         <div className="container mx-auto text-center text-muted-foreground">
-          <p>&copy; 2024 POS System. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} POS System. All rights reserved.</p>
         </div>
       </footer>
     </div>

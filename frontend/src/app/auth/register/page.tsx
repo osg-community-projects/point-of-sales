@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { CreditCard, Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
+import { authService } from "@/services";
 
 export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
@@ -32,28 +33,18 @@ export default function RegisterPage() {
     }
 
     try {
-      const response = await fetch("http://localhost:8001/api/auth/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          username: formData.username,
-          email: formData.email,
-          full_name: formData.full_name,
-          password: formData.password,
-        }),
+      await authService.register({
+        username: formData.username,
+        email: formData.email,
+        full_name: formData.full_name,
+        password: formData.password,
       });
 
-      if (response.ok) {
-        toast.success("Registration successful! Please login.");
-        window.location.href = "/auth/login";
-      } else {
-        const error = await response.json();
-        toast.error(error.detail || "Registration failed");
-      }
-    } catch (error) {
-      toast.error("Network error. Please try again.");
+      toast.success("Registration successful! Please login.");
+      window.location.href = "/auth/login";
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.detail || "Registration failed";
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }

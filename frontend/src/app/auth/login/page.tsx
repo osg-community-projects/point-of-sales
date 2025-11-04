@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { CreditCard, Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
+import { authService } from "@/services";
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
@@ -22,28 +23,17 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
-      const response = await fetch("http://localhost:8001/api/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-        body: new URLSearchParams({
-          username: formData.username,
-          password: formData.password,
-        }),
+      const response = await authService.login({
+        username: formData.username,
+        password: formData.password,
       });
 
-      if (response.ok) {
-        const data = await response.json();
-        localStorage.setItem("token", data.access_token);
-        toast.success("Login successful!");
-        window.location.href = "/dashboard";
-      } else {
-        const error = await response.json();
-        toast.error(error.detail || "Login failed");
-      }
-    } catch (error) {
-      toast.error("Network error. Please try again.");
+      authService.setToken(response.access_token);
+      toast.success("Login successful!");
+      window.location.href = "/dashboard";
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.detail || "Login failed";
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }
